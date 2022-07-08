@@ -1,1 +1,0 @@
-import miner_exporter.subscribers.logger_subscriber

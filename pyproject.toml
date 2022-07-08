@@ -13,6 +13,7 @@ PyEventEmitter = "^1.0.5"
 sty = "^1.0.4"
 python-dotenv = "^0.20.0"
 click = "^8.1.3"
+py3nvml = "^0.2.7"
 
 [tool.poetry.dev-dependencies]
 black = "^22.3.0"

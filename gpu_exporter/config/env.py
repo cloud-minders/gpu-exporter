@@ -12,6 +12,6 @@ pushgateway_password = os.getenv("PUSHGATEWAY_PASSWORD")
 pushgateway_job_id = socket.gethostname()
 
 try:
-    push_interval_secounds = int(os.getenv("PUSH_INTERVAL_SECOUNDS"))
+    run_interval_secounds = int(os.getenv("RUN_INTERVAL_SECOUNDS"))
 except TypeError:
-    push_interval_secounds = 60
+    run_interval_secounds = 60

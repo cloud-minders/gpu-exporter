@@ -1,5 +1,5 @@
-from miner_exporter.config.events_emitter import emitter, events
-from miner_exporter.config.logger import logger
+from gpu_exporter.config.events_emitter import emitter, events
+from gpu_exporter.config.logger import logger
 
 
 @events.on(emitter=emitter, event="logger.debug")

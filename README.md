@@ -14,6 +14,14 @@ Collect data about GPUs and exposes them for Prometheus
 > 💡  [More information on poetry](https://python-poetry.org/docs/)
 
 
+```sh
+# install dependencies
+$ poetry install
+
+# shell into project
+$ poetry shell
+```
+
 ## Maintainers
 
 [@mezerotm](https://github.com/mezerotm)

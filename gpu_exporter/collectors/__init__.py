@@ -1,0 +1,1 @@
+from gpu_exporter.collectors.nvidia_collector import NvidiaCollector

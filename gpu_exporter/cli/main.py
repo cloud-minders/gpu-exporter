@@ -1,6 +1,6 @@
 import click
 import toml
-from miner_exporter.cli.exporter_command import exporter
+from gpu_exporter.cli.exporter_command import exporter
 
 pyproject = toml.load("pyproject.toml")["tool"]["poetry"]
 

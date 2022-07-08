@@ -1,4 +1,4 @@
-from miner_exporter.config.env import logging_level
+from gpu_exporter.config.env import logging_level
 import logging
 import toml
 import sty
