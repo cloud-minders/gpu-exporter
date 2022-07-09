@@ -6,6 +6,8 @@ load_dotenv()
 
 python_env = os.getenv("PYTHON_ENV") or "development"
 logging_level = os.getenv("LOGGING_LEVEL") or "INFO"
+server_port = os.getenv("SERVER_PORT")
+textfile_path = os.getenv("TEXTFILE_PATH")
 pushgateway_api_url = os.getenv("PUSHGATEWAY_API_URL")
 pushgateway_username = os.getenv("PUSHGATEWAY_USERNAME")
 pushgateway_password = os.getenv("PUSHGATEWAY_PASSWORD")

@@ -6,6 +6,8 @@ from gpu_exporter.config.env import (
     pushgateway_api_url,
     pushgateway_job_id,
     run_interval_secounds,
+    server_port as env_server_port,
+    textfile_path as env_textfile_path,
 )
 import time
 import toml
@@ -24,7 +26,7 @@ def start_exporter(
     push_job_id=None,
     push_url="localhost:9091",
     mode="server",
-    textfile_write_file="/var/lib/node_exporter/textfile_collector/gpu_exporter.prom",
+    textfile_path="/var/lib/node_exporter/textfile_collector/gpu_exporter.prom",
     nvidia_enabled=False,
     amd_enabled=False,
     server_port=9235,
@@ -33,14 +35,27 @@ def start_exporter(
 
     # mode strategies
     def start_server(registry):
-        emitter.emit("logger.info", msg=f"Starting metrics server on ::{server_port}")
-        prometheus_client.start_http_server(port=server_port, registry=registry)
+        _server_port = env_server_port
+        if server_port != 9235 or env_server_port == None:
+            _server_port = server_port
+
+        emitter.emit("logger.info", msg=f"Starting metrics server on ::{_server_port}")
+        prometheus_client.start_http_server(port=_server_port, registry=registry)
+        # let server run forever
         while True:
             pass
 
     def run_textfile(registry):
-        emitter.emit("logger.info", msg=f"writing metrics to {textfile_write_file}")
-        prometheus_client.write_to_textfile(path=textfile_write_file, registry=registry)
+        _textfile_path = env_textfile_path
+        if (
+            textfile_path
+            != "/var/lib/node_exporter/textfile_collector/gpu_exporter.prom"
+            or env_textfile_path == None
+        ):
+            _textfile_path = textfile_path
+
+        emitter.emit("logger.info", msg=f"writing metrics to {_textfile_path}")
+        prometheus_client.write_to_textfile(path=_textfile_path, registry=registry)
 
     def run_pushgateway(registry):
         _pushgateway_api_url = pushgateway_api_url
