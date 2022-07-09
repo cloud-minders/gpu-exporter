@@ -14,4 +14,4 @@ pushgateway_job_id = socket.gethostname()
 try:
     run_interval_secounds = int(os.getenv("RUN_INTERVAL_SECOUNDS"))
 except TypeError:
-    run_interval_secounds = 60
+    run_interval_secounds = None

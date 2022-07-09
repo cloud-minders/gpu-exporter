@@ -11,28 +11,55 @@ import time
 import toml
 from py3nvml import py3nvml as nv
 import atexit
-
-from gpu_exporter.collectors import NvidiaCollector, nvidia_collector
+from gpu_exporter.collectors import NvidiaCollector
 
 pyproject = toml.load("pyproject.toml")["tool"]["poetry"]
 
 
 def start_exporter(
-    mode, textfile_write_file, server_port, nvidia_enabled, amd_enabled, custom_labels
+    custom_labels,
+    interval=60,
+    push_user=None,
+    push_pass=None,
+    push_job_id=None,
+    push_url="localhost:9091",
+    mode="server",
+    textfile_write_file="/var/lib/node_exporter/textfile_collector/gpu_exporter.prom",
+    nvidia_enabled=False,
+    amd_enabled=False,
+    server_port=9235,
 ):
     emitter.emit("logger.debug", msg="start_exporter")
 
     # mode strategies
     def start_server(registry):
         emitter.emit("logger.info", msg=f"Starting metrics server on ::{server_port}")
-        print("Under Construction.")
+        prometheus_client.start_http_server(port=server_port, registry=registry)
+        while True:
+            pass
 
     def run_textfile(registry):
         emitter.emit("logger.info", msg=f"writing metrics to {textfile_write_file}")
         prometheus_client.write_to_textfile(path=textfile_write_file, registry=registry)
 
     def run_pushgateway(registry):
-        emitter.emit("logger.info", msg=f"pushing metrics to {pushgateway_api_url}")
+        _pushgateway_api_url = pushgateway_api_url
+        if push_url != "localhost:9091" or pushgateway_api_url == None:
+            _pushgateway_api_url = push_url
+
+        _pushgateway_username = pushgateway_username
+        if push_user != None:
+            _pushgateway_username = push_user
+
+        _pushgateway_password = pushgateway_password
+        if push_pass != None:
+            _pushgateway_password = push_pass
+
+        _pushgateway_job_id = pushgateway_job_id
+        if push_job_id != None:
+            _pushgateway_job_id = push_job_id
+
+        emitter.emit("logger.info", msg=f"pushing metrics to {_pushgateway_api_url}")
 
         def pushgateway_auth_handler(url, method, timeout, headers, data):
             return prometheus_client.exposition.basic_auth_handler(
@@ -41,16 +68,16 @@ def start_exporter(
                 timeout,
                 headers,
                 data,
-                pushgateway_username,
-                pushgateway_password,
+                _pushgateway_username,
+                _pushgateway_password,
             )
 
         job_id = pyproject["name"]
-        if pushgateway_job_id != None:
-            job_id += f"_{pushgateway_job_id}"
+        if _pushgateway_job_id != None:
+            job_id += f"_{_pushgateway_job_id}"
 
         prometheus_client.push_to_gateway(
-            pushgateway_api_url,
+            _pushgateway_api_url,
             job=job_id,
             registry=registry,
             handler=pushgateway_auth_handler,
@@ -70,22 +97,17 @@ def start_exporter(
         pass
 
     # Start/Run mode strategy
+    _run_interval_secounds = run_interval_secounds
+    if interval != 60 or run_interval_secounds == None:
+        _run_interval_secounds = interval
+
     if mode == "server":
         start_server(registry)
     elif mode == "textfile":
         while True:
             run_textfile(registry)
-            time.sleep(run_interval_secounds)
+            time.sleep(_run_interval_secounds)
     elif mode == "pushgateway":
         while True:
             run_pushgateway(registry)
-            time.sleep(run_interval_secounds)
-
-
-# if xmrig_url != None:
-#     xmrig_collector = XmrigCollector(xmrig_url, custom_labels)
-#     registry.register(xmrig_collector)
-
-# if trex_url != None:
-#     trex_collector = TrexCollector(trex_url, custom_labels)
-#     registry.register(trex_collector)
+            time.sleep(_run_interval_secounds)
