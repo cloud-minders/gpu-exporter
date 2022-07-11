@@ -12,5 +12,4 @@ if __name__ == "__main__":
         emitter.emit("logger.error", msg=repr(error))
         emitter.emit("logger.error", msg=traceback.print_exc().__str__())
 
-    emitter.emit("logger.info", msg="finished running cli.")
-
+    emitter.emit("logger.debug", msg="finished running cli.")

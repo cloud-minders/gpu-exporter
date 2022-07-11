@@ -7,7 +7,9 @@ import click
 @click.option(
     "--mode",
     "-m",
-    type=click.Choice(["server", "textfile", "pushgateway"], case_sensitive=False),
+    type=click.Choice(
+        ["server", "textfile", "pushgateway", "stdout"], case_sensitive=False
+    ),
     default="server",
     show_default=True,
 )
@@ -83,7 +85,7 @@ def exporter(
         push_url=push_url,
         push_job_id=push_job_id,
         mode=mode,
-        textfile_write_file=textfile,
+        textfile_path=textfile,
         server_port=port,
         nvidia_enabled=nvidia,
         amd_enabled=amd,

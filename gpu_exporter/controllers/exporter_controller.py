@@ -14,6 +14,7 @@ import toml
 from py3nvml import py3nvml as nv
 import atexit
 from gpu_exporter.collectors import NvidiaCollector
+import sys
 
 pyproject = toml.load("pyproject.toml")["tool"]["poetry"]
 
@@ -126,3 +127,5 @@ def start_exporter(
         while True:
             run_pushgateway(registry)
             time.sleep(_run_interval_secounds)
+    elif mode == "stdout":
+        sys.stdout.write(prometheus_client.generate_latest(registry).decode("utf-8"))
