@@ -4,6 +4,9 @@ version = "0.0.1"
 description = "Collect data about GPUs and exposes them for Prometheus"
 authors = ["Carlos Rincon <c.rincon@addermobile.com>"]
 
+[tool.poetry.scripts]
+gpu-exporter = "gpu_exporter:main"
+
 [tool.poetry.dependencies]
 python = "^3.7"
 requests = "^2.28.0"
