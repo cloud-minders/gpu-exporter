@@ -24,7 +24,7 @@ $ poetry shell
 
 ```sh
 $ gpu-exporter --help
-Usage: main.py [OPTIONS] COMMAND [ARGS]...
+Usage: gpu-exporter [OPTIONS] COMMAND [ARGS]...
 
 Options:
   --version  Show the version and exit.
