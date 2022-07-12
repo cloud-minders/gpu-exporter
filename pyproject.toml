@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gpu_exporter"
-version = "0.0.1"
+version = "0.0.2"
 description = "Collect data about GPUs and exposes them for Prometheus"
 authors = ["Carlos Rincon <c.rincon@addermobile.com>"]
 
