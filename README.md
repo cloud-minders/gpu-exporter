@@ -18,12 +18,6 @@ Collect data about GPUs and exposes them for Prometheus
 # install dependencies
 $ poetry install
 
-# path #1: Install on system
-$ poetry build
-$ pip install dist/gpu_exporter-<version>.tar.gz
-$ gpu-exporter --help
-
-# path #2: Use in virtualenv
 # shell into project
 $ poetry shell
 ```

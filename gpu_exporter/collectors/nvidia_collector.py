@@ -1,6 +1,6 @@
 from py3nvml import py3nvml as nvml
 from gpu_exporter.libs.utils import make_metric
-import re
+from gpu_exporter.config.events_emitter import emitter
 
 
 class NvidiaCollector(object):
@@ -13,6 +13,7 @@ class NvidiaCollector(object):
         ]
 
     def collect(self):
+        emitter.emit("logger.debug", msg="collecting from NvidiaCollector")
         metrics = []
 
         ids = {"driver": self.nv.nvmlSystemGetDriverVersion()}

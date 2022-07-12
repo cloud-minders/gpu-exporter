@@ -15,12 +15,13 @@ from py3nvml import py3nvml as nv
 import atexit
 from gpu_exporter.collectors import NvidiaCollector
 import sys
+from http.server import HTTPServer
 
 pyproject = toml.load("pyproject.toml")["tool"]["poetry"]
 
 
 def start_exporter(
-    custom_labels,
+    custom_labels=None,
     interval=60,
     push_user=None,
     push_pass=None,
@@ -41,10 +42,9 @@ def start_exporter(
             _server_port = server_port
 
         emitter.emit("logger.info", msg=f"Starting metrics server on ::{_server_port}")
-        prometheus_client.start_http_server(port=_server_port, registry=registry)
-        # let server run forever
-        while True:
-            pass
+        metrics_handler = prometheus_client.MetricsHandler.factory(registry=registry)
+        server = HTTPServer(("0.0.0.0", _server_port), metrics_handler)
+        server.serve_forever()
 
     def run_textfile(registry):
         _textfile_path = env_textfile_path
@@ -102,14 +102,14 @@ def start_exporter(
     # Add registries
     registry = prometheus_client.CollectorRegistry()
 
-    if nvidia_enabled:
+    if nvidia_enabled != None:
         nv.nvmlInit()
         atexit.register(nv.nvmlShutdown)
 
         nvidia_collector = NvidiaCollector(nv, custom_labels)
         registry.register(nvidia_collector)
 
-    if amd_enabled:
+    if amd_enabled != None:
         pass
 
     # Start/Run mode strategy

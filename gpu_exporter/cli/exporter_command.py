@@ -77,7 +77,6 @@ def exporter(
     label,
 ):
     """Run exporter"""
-
     controller.start_exporter(
         interval=interval,
         push_user=push_user,
