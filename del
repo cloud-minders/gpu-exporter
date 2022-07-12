@@ -1,41 +1,3 @@
-# gpu_exporter
-
-Collect data about GPUs and exposes them for Prometheus
-
-## Table of Contents
-
-- [gpu_exporter](#gpu_exporter)
-  - [Table of Contents](#table-of-contents)
-  - [Usage](#usage)
-  - [Maintainers](#maintainers)
-  - [License](#license)
-
-## Usage
-> 💡  [More information on poetry](https://python-poetry.org/docs/)
-
-
-```sh
-# install dependencies
-$ poetry install
-
-# shell into project
-$ poetry shell
-```
-
-```sh
-$ gpu-exporter --help
-Usage: main.py [OPTIONS] COMMAND [ARGS]...
-
-Options:
-  --version  Show the version and exit.
-  --help     Show this message and exit.
-
-Commands:
-  exporter  Run exporter
-```
-
-```sh
-$ gpu-exporter exporter --help
 Usage: gpu-exporter exporter [OPTIONS]
 
   Run exporter
@@ -55,15 +17,4 @@ Options:
   --nvidia                        Enable Nvidia metrics
   --amd                           Enable AMD metrics
   -l, --label <TEXT TEXT>...
-  --help                          Show this message and exit.  
-```
-
-Exposes metrics API on 0.0.0.0:9235 by default
-
-## Maintainers
-
-[@mezerotm](https://github.com/mezerotm)
-
-## License
-
-© 2022 Cloud Minders
+  --help                          Show this message and exit.
