@@ -5,7 +5,7 @@ from prometheus_client.core import (
 )
 
 
-def make_metric(name, documentation, value, metric_type="counter", **labels):
+def make_metric(name, documentation, value=None, metric_type="counter", **labels):
     """
     It takes a metric name, documentation, value, and a dictionary of labels, and returns a metric
     object
@@ -17,7 +17,6 @@ def make_metric(name, documentation, value, metric_type="counter", **labels):
     to counter (optional)
     :return: A metric object
     """
-    label_names = list(labels.keys())
 
     c = CounterMetricFamily
 
@@ -25,12 +24,19 @@ def make_metric(name, documentation, value, metric_type="counter", **labels):
         c = GaugeMetricFamily
     if metric_type == "info":
         c = InfoMetricFamily
-    # elif metric_type == "summary":
-    #     c = SummaryMetricFamily
-    # elif metric_type == "histogram":
-    #     c = HistogramMetricFamily
+
+    label_names = list(labels.keys())
 
     metric = c(name, documentation or "No Documentation", labels=label_names)
+
+    if value != None:
+        metric.add_metric([str(labels[k]) for k in label_names], value)
+
+    return metric
+
+
+def add_metric(metric, value, **labels):
+    label_names = list(labels.keys())
     metric.add_metric([str(labels[k]) for k in label_names], value)
 
     return metric

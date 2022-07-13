@@ -1,6 +1,7 @@
 from py3nvml import py3nvml as nvml
-from gpu_exporter.libs.utils import make_metric
+from gpu_exporter.libs.utils import make_metric, add_metric
 from gpu_exporter.config.events_emitter import emitter
+from collections import OrderedDict
 
 
 class NvidiaCollector(object):
@@ -16,36 +17,65 @@ class NvidiaCollector(object):
         emitter.emit("logger.debug", msg="collecting from NvidiaCollector")
         metrics = []
 
-        ids = {"driver": self.nv.nvmlSystemGetDriverVersion()}
+        labels = {
+            "driver": self.nv.nvmlSystemGetDriverVersion(),
+            "gpu": "",
+            "gpu_name": "",
+        }
 
         for i in range(len(self.custom_labels)):
-            ids[self.custom_labels[i][0]] = self.custom_labels[i][1]
+            labels[self.custom_labels[i][0]] = self.custom_labels[i][1]
 
+        metric_memused = make_metric(
+            self.prefix + "gpu_memory_bytes_used",
+            "Used GPU Memory",
+            None,
+            "gauge",
+            **labels,
+        )
+
+        metric_memtotal = make_metric(
+            self.prefix + "gpu_memory_bytes_total",
+            "Total GPU Memory",
+            None,
+            "gauge",
+            **labels,
+        )
+
+        metric_powertotal = make_metric(
+            self.prefix + "gpu_power_watts",
+            "GPU Power Utilization",
+            None,
+            "gauge",
+            **labels,
+        )
+
+        metric_temp = make_metric(
+            self.prefix + "gpu_temp_celsius", "GPU Temperature", None, "gauge", **labels
+        )
+
+        metric_utilpct = make_metric(
+            self.prefix + "gpu_usage_ratio",
+            "GPU Usage Percentage",
+            None,
+            "gauge",
+            **labels,
+        )
+
+        device_labels = []
         for i, device in enumerate(self.devices):
-            ids["gpu"] = f"gpu{i}"
-            ids["gpu_name"] = self.nv.nvmlDeviceGetName(device)
+            dl = {}
+            dl["gpu"] = f"gpu{i}"
+            dl["gpu_name"] = self.nv.nvmlDeviceGetName(device)
+            device_labels.append(dl)
+
+        for device, dl in zip(self.devices, device_labels):
+            _labels = {**labels, **dl}
 
             mem_info = self.nv.nvmlDeviceGetMemoryInfo(device)
 
-            metrics.append(
-                make_metric(
-                    self.prefix + "gpu_memory_bytes_used",
-                    "Used GPU Memory",
-                    mem_info.used,
-                    "gauge",
-                    **ids,
-                )
-            )
-
-            metrics.append(
-                make_metric(
-                    self.prefix + "gpu_memory_bytes_total",
-                    "Total GPU Memory",
-                    mem_info.total,
-                    "gauge",
-                    **ids,
-                )
-            )
+            add_metric(metric_memused, mem_info.used, **_labels)
+            add_metric(metric_memtotal, mem_info.total, **_labels)
 
             temp_info = 0
             try:
@@ -55,34 +85,22 @@ class NvidiaCollector(object):
             except self.nv.NVMLError_NotSupported:
                 temp_info = -1
 
-            metrics.append(
-                make_metric(
-                    self.prefix + "gpu_temp_celsius",
-                    "GPU Temperature",
-                    temp_info,
-                    "gauge",
-                    **ids,
-                )
-            )
+            add_metric(metric_temp, temp_info, **_labels)
 
-            metrics.append(
-                make_metric(
-                    self.prefix + "gpu_power_watts",
-                    "GPU Power Utilization",
-                    self.nv.nvmlDeviceGetPowerUsage(device) / 1000,
-                    "gauge",
-                    **ids,
-                )
-            )
+            powertotal = self.nv.nvmlDeviceGetPowerUsage(device) / 1000
+            add_metric(metric_powertotal, powertotal, **_labels)
 
-            metrics.append(
-                make_metric(
-                    self.prefix + "gpu_usage_ratio",
-                    "GPU Usage Percentage",
-                    self.nv.nvmlDeviceGetUtilizationRates(device).gpu,
-                    "gauge",
-                    **ids,
-                )
-            )
+            utilpct = self.nv.nvmlDeviceGetUtilizationRates(device).gpu
+            add_metric(metric_utilpct, utilpct, **_labels)
+
+        metrics.extend(
+            [
+                metric_memused,
+                metric_memtotal,
+                metric_temp,
+                metric_powertotal,
+                metric_utilpct,
+            ]
+        )
 
         return metrics
