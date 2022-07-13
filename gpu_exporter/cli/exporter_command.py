@@ -16,7 +16,7 @@ import click
 @click.option(
     "--textfile",
     "-tf",
-    default="/var/lib/node_exporter/textfile_collector/gpu_exporter.prom",
+    default="/var/lib/node_exporter/textfile_collector",
     show_default=True,
     help="textfile location",
 )
@@ -50,6 +50,7 @@ import click
     "--interval",
     "-i",
     default=60,
+    show_default=True,
     help="Interval in seconds for scraping metrics",
 )
 @click.option(
