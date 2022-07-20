@@ -1,10 +1,10 @@
-# gpu_exporter
+# gpu-exporter
 
 Collect data about GPUs and exposes them for Prometheus
 
 ## Table of Contents
 
-- [gpu_exporter](#gpu_exporter)
+- [gpu-exporter](#gpu-exporter)
   - [Table of Contents](#table-of-contents)
   - [Usage](#usage)
   - [Maintainers](#maintainers)
